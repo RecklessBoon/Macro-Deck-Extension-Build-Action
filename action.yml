@@ -1,0 +1,88 @@
+name: 'Build Macro Deck Extension'
+description: 'Build a Macro Deck Extension from source'
+
+runs:
+  using: "composite"
+  
+  steps:
+  - name: Install XMLStarlet
+    run: sudo apt-get install -y xmlstarlet jq
+    
+  - uses: actions/checkout@v3
+    with: 
+      path: plugin
+      
+  - name: Extract Extension info
+    id: extension_info
+    run: |
+      echo "EXT_TYPE=$(jq '.type')" >> $GITHUB_OUTPUT
+      echo "EXT_PACKAGE_ID=$(jq '.packageId')" >> $GITHUB_OUTPUT    
+
+  - uses: actions/checkout@v3
+    with: 
+      repository: SuchByte/Macro-Deck
+      ref: refs/heads/main
+      path: macro-deck
+      
+  - name: Setup .NET
+    uses: actions/setup-dotnet@v3
+    with:
+      dotnet-version: 6.0.x
+
+  - name: Remove Pre Build Targets
+    working-directory: ./macro-deck
+    run : |
+      xmlstarlet ed -P -L --delete '//Target[@Name="PreBuild"]' *.csproj
+      xmlstarlet ed -P -L --delete '//Target[@Name="PostBuild"]' *.csproj
+
+  - name: Remove COM Reference
+    working-directory: ./macro-deck
+    run: dotnet remove reference NetFwTypeLib
+
+  - name: Restore dependencies
+    working-directory: ./macro-deck
+    run: dotnet restore -property:EnableWindowsTargeting=true
+
+  - name: Build Macro Deck
+    working-directory: ./macro-deck
+    run: dotnet build --configuration Release --runtime win-x64 --no-restore -property:EnableWindowsTargeting=true -property:SignAssembly=false
+
+  - name: Remove Pre Build Targets
+    working-directory: ./plugin
+    run : |
+      xmlstarlet ed -P -L --delete '//Target[@Name="PreBuild"]' *.csproj
+      xmlstarlet ed -P -L --delete '//Target[@Name="PostBuild"]' *.csproj
+
+  - name: Move dll into location
+    working-directory: ./macro-deck
+    run: |
+      cp './bin/Release/netcoreapp3.1/win-x64/Macro Deck 2.dll' '../plugin/Macro Deck 2.dll'
+
+  - name: Restore dependencies
+    working-directory: ./plugin
+    run: dotnet restore /p:EnableWindowsTargeting=true
+
+  - name: Build Plugin
+    working-directory: ./plugin
+    run: dotnet build --configuration Release --runtime win-x64 --no-restore /p:EnableWindowsTargeting=true
+
+  - name: Test
+    working-directory: ./plugin
+    run: dotnet test --no-build --verbosity normal
+
+  - name: Package Distributables
+    run: |
+      mkdir dist
+      cp ./plugin/bin/Release/netcoreapp3.1/win-x64/* ./dist
+      cp ./plugin/ExtensionManifest.json ./dist
+      cp ./plugin/ExtensionIcon.png ./dist
+      cp ./plugin/README.md ./dist 2>/dev/null || true
+      cp ./plugin/LICENSE ./dist 2>/dev/null || true
+
+  - name: Upload a Build Artifact
+    uses: actions/upload-artifact@v3.1.1
+    with:
+      path: ./dist
+      name: ${{ steps.extension_info.outputs.EXT_PACKAGE_ID }}
+      error: Files not found
+      if-no-files-found: error

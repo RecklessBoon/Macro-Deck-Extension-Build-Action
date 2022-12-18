@@ -22,6 +22,7 @@ runs:
       
   - name: Validate Extension Info
     if: ${{ steps.extension_info.outputs.EXT_TYPE }} == '' || ${{ steps.extension_info.outputs.EXT_PACKAGE_ID }} == ''
+    shell: bash
     run: echo "::error ::Unable to determine extension type and/or package ID"
 
   - uses: actions/checkout@v3

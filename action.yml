@@ -51,7 +51,7 @@ runs:
   - name: Build Macro Deck
     working-directory: ./macro-deck
     shell: bash
-    run: dotnet build --configuration Release --runtime win-x64 --no-restore -property:EnableWindowsTargeting=true -property:SignAssembly=false
+    run: dotnet build --configuration Release --arch x64 --os win --no-restore -property:EnableWindowsTargeting=true -property:SignAssembly=false
 
   - name: Remove Pre Build Targets
     working-directory: ./plugin
@@ -74,7 +74,7 @@ runs:
   - name: Build Plugin
     working-directory: ./plugin
     shell: bash
-    run: dotnet build --configuration Release --runtime win-x64 --no-restore /p:EnableWindowsTargeting=true
+    run: dotnet build --configuration Release --arch x64 --os win --no-restore /p:EnableWindowsTargeting=true
 
   - name: Test
     working-directory: ./plugin

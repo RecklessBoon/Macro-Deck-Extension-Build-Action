@@ -6,6 +6,7 @@ runs:
   
   steps:
   - name: Install XMLStarlet
+    shell: bash
     run: sudo apt-get install -y xmlstarlet jq
     
   - uses: actions/checkout@v3
@@ -14,6 +15,7 @@ runs:
       
   - name: Extract Extension info
     id: extension_info
+    shell: bash
     run: |
       echo "EXT_TYPE=$(jq '.type')" >> $GITHUB_OUTPUT
       echo "EXT_PACKAGE_ID=$(jq '.packageId')" >> $GITHUB_OUTPUT    
@@ -31,46 +33,56 @@ runs:
 
   - name: Remove Pre Build Targets
     working-directory: ./macro-deck
+    shell: bash
     run : |
       xmlstarlet ed -P -L --delete '//Target[@Name="PreBuild"]' *.csproj
       xmlstarlet ed -P -L --delete '//Target[@Name="PostBuild"]' *.csproj
 
   - name: Remove COM Reference
     working-directory: ./macro-deck
+    shell: bash
     run: dotnet remove reference NetFwTypeLib
 
   - name: Restore dependencies
     working-directory: ./macro-deck
+    shell: bash
     run: dotnet restore -property:EnableWindowsTargeting=true
 
   - name: Build Macro Deck
     working-directory: ./macro-deck
+    shell: bash
     run: dotnet build --configuration Release --runtime win-x64 --no-restore -property:EnableWindowsTargeting=true -property:SignAssembly=false
 
   - name: Remove Pre Build Targets
     working-directory: ./plugin
+    shell: bash
     run : |
       xmlstarlet ed -P -L --delete '//Target[@Name="PreBuild"]' *.csproj
       xmlstarlet ed -P -L --delete '//Target[@Name="PostBuild"]' *.csproj
 
   - name: Move dll into location
     working-directory: ./macro-deck
+    shell: bash
     run: |
       cp './bin/Release/netcoreapp3.1/win-x64/Macro Deck 2.dll' '../plugin/Macro Deck 2.dll'
 
   - name: Restore dependencies
     working-directory: ./plugin
+    shell: bash
     run: dotnet restore /p:EnableWindowsTargeting=true
 
   - name: Build Plugin
     working-directory: ./plugin
+    shell: bash
     run: dotnet build --configuration Release --runtime win-x64 --no-restore /p:EnableWindowsTargeting=true
 
   - name: Test
     working-directory: ./plugin
+    shell: bash
     run: dotnet test --no-build --verbosity normal
 
   - name: Package Distributables
+    shell: bash
     run: |
       mkdir dist
       cp ./plugin/bin/Release/netcoreapp3.1/win-x64/* ./dist

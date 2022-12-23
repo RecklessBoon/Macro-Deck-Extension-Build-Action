@@ -99,7 +99,8 @@ runs:
       cp ./plugin/ExtensionIcon.png ./dist
       cp ./plugin/README.md ./dist 2>/dev/null || true
       cp ./plugin/LICENSE ./dist 2>/dev/null || true
-      zip -r ${{ steps.extension_info.outputs.EXT_PACKAGE_ID }}.zip ./dist
+      cd ./dist
+      zip -r ../${{ steps.extension_info.outputs.EXT_PACKAGE_ID }}.zip *
 
   - name: Upload a Build Artifact
     uses: actions/upload-artifact@v3.1.1

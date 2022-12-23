@@ -24,7 +24,7 @@ runs:
   - name: Validate Extension Info
     if: ${{ steps.extension_info.outputs.EXT_TYPE }} == '' || ${{ steps.extension_info.outputs.EXT_PACKAGE_ID }} == ''
     shell: bash
-    run: echo "::error ::Invalid ExtensionManifest.json file. Required attributes: version, type, packageId"
+    run: echo "::error file=ExtensionManifest.json::Invalid manifest! Required attributes [version, type, packageId]"
 
   - uses: actions/checkout@v3
     with: 

@@ -17,13 +17,14 @@ runs:
     id: extension_info
     shell: bash
     run: |
+      echo "EXT_VERSION=$(jq '.version' ./plugin/ExtensionManifest.json)" >> $GITHUB_OUTPUT
       echo "EXT_TYPE=$(jq '.type' ./plugin/ExtensionManifest.json)" >> $GITHUB_OUTPUT
       echo "EXT_PACKAGE_ID=$(jq '.packageId' ./plugin/ExtensionManifest.json)" >> $GITHUB_OUTPUT
       
   - name: Validate Extension Info
     if: ${{ steps.extension_info.outputs.EXT_TYPE }} == '' || ${{ steps.extension_info.outputs.EXT_PACKAGE_ID }} == ''
     shell: bash
-    run: echo "::error ::Unable to determine extension type and/or package ID"
+    run: echo "::error ::Invalid ExtensionManifest.json file. Required attributes: version, type, packageId"
 
   - uses: actions/checkout@v3
     with: 
@@ -103,3 +104,14 @@ runs:
       name: ${{ steps.extension_info.outputs.EXT_PACKAGE_ID }}
       error: Files not found
       if-no-files-found: error
+
+  - uses: ncipollo/release-action@v1
+      with:
+        allowUpdates: true
+        artifactErrorsFailBuild: false
+        artifacts: "${{ steps.extension_info.outputs.EXT_PACKAGE_ID }}.zip"
+        commit: ${{ GITHUB_SHA }}
+        generateReleaseNotes: true
+        makeLatest: true
+        replacesArtifacts: true
+        tag: ${{ steps.extension_info.outputs.EXT_VERSION }}

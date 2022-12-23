@@ -106,7 +106,6 @@ runs:
     with:
       path: ./${{ steps.extension_info.outputs.EXT_PACKAGE_ID }}.zip
       name: ${{ steps.extension_info.outputs.EXT_PACKAGE_ID }}
-      error: Files not found
       if-no-files-found: error
 
   - name: Create/Update Release
@@ -114,7 +113,7 @@ runs:
     with:
       allowUpdates: true
       artifactErrorsFailBuild: false
-      artifacts: ./${{ steps.extension_info.outputs.EXT_PACKAGE_ID }}.zip
+      artifacts: './${{ steps.extension_info.outputs.EXT_PACKAGE_ID }}.zip'
       commit: ${{ github.sha }}
       generateReleaseNotes: true
       makeLatest: true

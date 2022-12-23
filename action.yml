@@ -105,13 +105,14 @@ runs:
       error: Files not found
       if-no-files-found: error
 
-  - uses: ncipollo/release-action@v1
-      with:
-        allowUpdates: true
-        artifactErrorsFailBuild: false
-        artifacts: "${{ steps.extension_info.outputs.EXT_PACKAGE_ID }}.zip"
-        commit: ${{ GITHUB_SHA }}
-        generateReleaseNotes: true
-        makeLatest: true
-        replacesArtifacts: true
-        tag: ${{ steps.extension_info.outputs.EXT_VERSION }}
+  - name: Create/Update Release
+    uses: ncipollo/release-action@v1
+    with:
+      allowUpdates: true
+      artifactErrorsFailBuild: false
+      artifacts: "${{ steps.extension_info.outputs.EXT_PACKAGE_ID }}.zip"
+      commit: ${{ GITHUB_SHA }}
+      generateReleaseNotes: true
+      makeLatest: true
+      replacesArtifacts: true
+      tag: ${{ steps.extension_info.outputs.EXT_VERSION }}

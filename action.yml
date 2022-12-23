@@ -99,11 +99,12 @@ runs:
       cp ./plugin/ExtensionIcon.png ./dist
       cp ./plugin/README.md ./dist 2>/dev/null || true
       cp ./plugin/LICENSE ./dist 2>/dev/null || true
+      zip -r ${{ steps.extension_info.outputs.EXT_PACKAGE_ID }}.zip ./dist
 
   - name: Upload a Build Artifact
     uses: actions/upload-artifact@v3.1.1
     with:
-      path: ./dist
+      path: ./${{ steps.extension_info.outputs.EXT_PACKAGE_ID }}.zip
       name: ${{ steps.extension_info.outputs.EXT_PACKAGE_ID }}
       error: Files not found
       if-no-files-found: error
@@ -113,7 +114,7 @@ runs:
     with:
       allowUpdates: true
       artifactErrorsFailBuild: false
-      artifacts: ./dist
+      artifacts: ./${{ steps.extension_info.outputs.EXT_PACKAGE_ID }}.zip
       commit: ${{ github.sha }}
       generateReleaseNotes: true
       makeLatest: true

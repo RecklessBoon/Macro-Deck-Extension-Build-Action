@@ -22,7 +22,10 @@ runs:
       echo "EXT_PACKAGE_ID=$(jq --raw-output '.packageId' ./plugin/ExtensionManifest.json)" >> $GITHUB_OUTPUT
       
   - name: Validate Extension Info
-    if: ${{ steps.extension_info.outputs.EXT_TYPE }} == '' || ${{ steps.extension_info.outputs.EXT_PACKAGE_ID }} == ''
+    if: |
+      steps.extension_info.outputs.EXT_TYPE == '' || 
+      steps.extension_info.outputs.EXT_PACKAGE_ID == '' || 
+      steps.extension_info.outputs.EXT_VERSION == ''
     shell: bash
     run: echo "::error file=ExtensionManifest.json::Invalid manifest! Required attributes [version, type, packageId]"
 

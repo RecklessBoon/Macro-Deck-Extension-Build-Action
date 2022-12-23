@@ -111,7 +111,7 @@ runs:
       allowUpdates: true
       artifactErrorsFailBuild: false
       artifacts: "${{ steps.extension_info.outputs.EXT_PACKAGE_ID }}.zip"
-      commit: $GITHUB_SHA
+      commit: ${{ github.sha }}
       generateReleaseNotes: true
       makeLatest: true
       replacesArtifacts: true

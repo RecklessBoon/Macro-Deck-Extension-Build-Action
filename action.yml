@@ -121,24 +121,7 @@ runs:
   - name: "[Icon Pack] Validate Contents"
     if: | 
       steps.extension_info.outputs.EXT_TYPE == 'IconPack' &&
-      hashFiles(
-        './plugin/*.apng',
-        './plugin/*.avif',
-        './plugin/*.gif',
-        './plugin/*.jpg',
-        './plugin/*.jpeg',
-        './plugin/*.jfif',
-        './plugin/*.pjpeg',
-        './plugin/*.pjp',
-        './plugin/*.png',
-        './plugin/*.svg',
-        './plugin/*.webp',
-        './plugin/*.bmp',
-        './plugin/*.ico',
-        './plugin/*.cur',
-        './plugin/*.tif',
-        './plugin/*.tiff'
-      ) == ''
+      hashFiles('./plugin/*.gif', './plugin/*.png', './plugin/*.jpg') == ''
     shell: bash
     run: | 
       echo "::error::No valid icons found"
@@ -148,7 +131,7 @@ runs:
     if: steps.extension_info.outputs.EXT_TYPE == 'IconPack'
     shell: bash
     run: |
-      cp ./plugin/*.{apng,avif,gif,jpg,jpeg,jfif,pjpeg,pjp,png,svg,webp,bmp,ico,cur,tif,tiff} ./dist 2>/dev/null || true
+      cp ./plugin/*.{gif,jpg,png} ./dist 2>/dev/null || true
       cp ./plugin/README.md ./dist 2>/dev/null || true
       cp ./plugin/LICENSE ./dist 2>/dev/null || true
       cp ./plugin/ExtensionManifest.json ./dist

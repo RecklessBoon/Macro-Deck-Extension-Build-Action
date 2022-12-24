@@ -27,7 +27,9 @@ runs:
       steps.extension_info.outputs.EXT_PACKAGE_ID == '' || 
       steps.extension_info.outputs.EXT_VERSION == ''
     shell: bash
-    run: echo "::error file=ExtensionManifest.json::Invalid manifest! Required attributes [version, type, packageId]"
+    run: |
+      echo "::error file=ExtensionManifest.json::Invalid manifest! Required attributes [version, type, packageId]"
+      exit 1
 
   - name: "[Plugin] Checkout Macro Deck"
     uses: actions/checkout@v3
@@ -138,7 +140,9 @@ runs:
         './plugin/*.tiff'
       ) == ''
     shell: bash
-    run: echo "::error::No valid icons found"            
+    run: | 
+      echo "::error::No valid icons found"
+      exit 1
       
   - name: "[Icon Pack] Stage Distributable"
     if: steps.extension_info.outputs.EXT_TYPE == 'IconPack'

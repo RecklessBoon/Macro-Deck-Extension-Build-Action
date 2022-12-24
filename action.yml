@@ -116,11 +116,18 @@ runs:
       cp ./plugin/README.md ./dist 2>/dev/null || true
       cp ./plugin/LICENSE ./dist 2>/dev/null || true
       
+  - name: "[Icon Pack] Validate Contents"
+    if: | 
+      steps.extension_info.outputs.EXT_TYPE == 'IconPack' &&
+      $(ls -1 *.{apng,avif,gif,jpg,jpeg,jfif,pjpeg,pjp,png,svg,webp,bmp,ico,cur,tif,tiff} 2>/dev/null | wc -l) != 0
+    shell: bash
+    run: echo "::error::No valid icons found"            
+      
   - name: "[Icon Pack] Stage Distributable"
     if: steps.extension_info.outputs.EXT_TYPE == 'IconPack'
     shell: bash
     run: |
-      cp ./plugin/*.{apng,avif,gif,jpg,jpeg,jfif,pjpeg,pjp,png,svg,webp,bmp,ico,cur,tif,tiff} ./dist
+      cp ./plugin/*.{apng,avif,gif,jpg,jpeg,jfif,pjpeg,pjp,png,svg,webp,bmp,ico,cur,tif,tiff} ./dist 2>/dev/null || true
       cp ./plugin/README.md ./dist 2>/dev/null || true
       cp ./plugin/LICENSE ./dist 2>/dev/null || true
       cp ./plugin/ExtensionManifest.json ./dist

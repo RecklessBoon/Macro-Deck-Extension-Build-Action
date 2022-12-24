@@ -29,68 +29,81 @@ runs:
     shell: bash
     run: echo "::error file=ExtensionManifest.json::Invalid manifest! Required attributes [version, type, packageId]"
 
-  - uses: actions/checkout@v3
+  - name: [Plugin] Checkout Macro Deck
+    uses: actions/checkout@v3
+    if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
     with: 
       repository: SuchByte/Macro-Deck
       ref: refs/heads/main
       path: macro-deck
       
-  - name: Setup .NET
+  - name: [Plugin] Setup .NET
+    if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
     uses: actions/setup-dotnet@v3
     with:
       dotnet-version: 6.0.x
 
-  - name: Remove Pre Build Targets
+  - name: [Plugin] Remove Pre Build Targets
+    if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
     working-directory: ./macro-deck
     shell: bash
     run : |
       xmlstarlet ed -P -L --delete '//Target[@Name="PreBuild"]' *.csproj
       xmlstarlet ed -P -L --delete '//Target[@Name="PostBuild"]' *.csproj
 
-  - name: Remove COM Reference
+  - name: [Plugin] Remove COM Reference
+    if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
     working-directory: ./macro-deck
     shell: bash
     run: dotnet remove reference NetFwTypeLib
 
-  - name: Restore dependencies
+  - name: [Plugin] Restore dependencies
+    if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
     working-directory: ./macro-deck
     shell: bash
     run: dotnet restore -property:EnableWindowsTargeting=true
 
-  - name: Build Macro Deck
+  - name: [Plugin] Build Macro Deck
+    if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
     working-directory: ./macro-deck
     shell: bash
     run: dotnet build --configuration Release --no-restore -property:EnableWindowsTargeting=true -property:SignAssembly=false
 
-  - name: Remove Pre Build Targets
+  - name: [Plugin] Remove Pre Build Targets
+    if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
     working-directory: ./plugin
     shell: bash
     run : |
       xmlstarlet ed -P -L --delete '//Target[@Name="PreBuild"]' *.csproj
       xmlstarlet ed -P -L --delete '//Target[@Name="PostBuild"]' *.csproj
 
-  - name: Move dll into location
+  - name: [Plugin] Move dll into location
+    if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
     working-directory: ./macro-deck
     shell: bash
     run: |
       cp './bin/Release/netcoreapp3.1/win-x64/Macro Deck 2.dll' '../plugin/Macro Deck 2.dll'
 
-  - name: Restore dependencies
+  - name: [Plugin] Restore dependencies
+    if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
     working-directory: ./plugin
     shell: bash
     run: dotnet restore /p:EnableWindowsTargeting=true
 
-  - name: Build Plugin
+  - name: [Plugin] Build Plugin
+    if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
     working-directory: ./plugin
     shell: bash
     run: dotnet build --configuration Release --no-restore /p:EnableWindowsTargeting=true
 
-  - name: Test
+  - name: [Plugin] Test
+    if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
     working-directory: ./plugin
     shell: bash
     run: dotnet test --no-build --verbosity normal
 
-  - name: Package Distributables
+  - name: [Plugin] Build Distributable
+    if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
     shell: bash
     run: |
       mkdir dist
@@ -99,6 +112,19 @@ runs:
       cp ./plugin/ExtensionIcon.png ./dist
       cp ./plugin/README.md ./dist 2>/dev/null || true
       cp ./plugin/LICENSE ./dist 2>/dev/null || true
+      
+  - name: [Icon Pack] Build Distributable
+    if: steps.extension_info.outputs.EXT_TYPE == 'IconPack'
+    shell: bash
+    run: |
+      cp ./plugin/*.{apng,avif,gif,jpg,jpeg,jfif,pjpeg,pjp,png,svg,webp,bmp,ico,cur,tif,tiff} ./dist
+      cp ./plugin/README.md ./dist 2>/dev/null || true
+      cp ./plugin/LICENSE ./dist 2>/dev/null || true
+      cp ./plugin/ExtensionManifest.json ./dist
+      
+  - name: Package Distributable
+    shell: bash
+    run: |
       cd ./dist
       zip -r ../${{ steps.extension_info.outputs.EXT_PACKAGE_ID }}.zip *
 

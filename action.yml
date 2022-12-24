@@ -102,18 +102,21 @@ runs:
     shell: bash
     run: dotnet test --no-build --verbosity normal
 
-  - name: "[Plugin] Build Distributable"
+  - name: Prepare Distributable Staging Area
+    shell: bash
+    run: mkdir dist
+
+  - name: "[Plugin] Stage Distributable"
     if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
     shell: bash
     run: |
-      mkdir dist
       cp ./plugin/bin/Release/netcoreapp3.1/* ./dist
       cp ./plugin/ExtensionManifest.json ./dist
       cp ./plugin/ExtensionIcon.png ./dist
       cp ./plugin/README.md ./dist 2>/dev/null || true
       cp ./plugin/LICENSE ./dist 2>/dev/null || true
       
-  - name: "[Icon Pack] Build Distributable"
+  - name: "[Icon Pack] Stage Distributable"
     if: steps.extension_info.outputs.EXT_TYPE == 'IconPack'
     shell: bash
     run: |

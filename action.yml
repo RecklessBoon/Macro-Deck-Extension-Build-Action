@@ -119,7 +119,24 @@ runs:
   - name: "[Icon Pack] Validate Contents"
     if: | 
       steps.extension_info.outputs.EXT_TYPE == 'IconPack' &&
-      $(ls -1 *.{apng,avif,gif,jpg,jpeg,jfif,pjpeg,pjp,png,svg,webp,bmp,ico,cur,tif,tiff} 2>/dev/null | wc -l) != 0
+      hashFiles(
+        './plugin/*.apng',
+        './plugin/*.avif',
+        './plugin/*.gif',
+        './plugin/*.jpg',
+        './plugin/*.jpeg',
+        './plugin/*.jfif',
+        './plugin/*.pjpeg',
+        './plugin/*.pjp',
+        './plugin/*.png',
+        './plugin/*.svg',
+        './plugin/*.webp',
+        './plugin/*.bmp',
+        './plugin/*.ico',
+        './plugin/*.cur',
+        './plugin/*.tif',
+        './plugin/*.tiff'
+      ) == ''
     shell: bash
     run: echo "::error::No valid icons found"            
       

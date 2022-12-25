@@ -17,10 +17,10 @@ runs:
     id: extension_info
     shell: bash
     run: |
-      echo "EXT_VERSION=$(jq --raw-output '.\"version\"' ./plugin/ExtensionManifest.json)" >> $GITHUB_OUTPUT
-      echo "EXT_TYPE=$(jq --raw-output '.\"type\"' ./plugin/ExtensionManifest.json)" >> $GITHUB_OUTPUT
-      echo "EXT_PACKAGE_ID=$(jq --raw-output '.\"packageId\"' ./plugin/ExtensionManifest.json)" >> $GITHUB_OUTPUT
-      echo "EXT_TARGET_API_VERSION=$(jq '.\"target-plugin-api-version\"' ./plugin/ExtensionManifest.json)" >> $GITHUB_OUTPUT
+      echo "EXT_VERSION=$(jq --raw-output '."version"' ./plugin/ExtensionManifest.json)" >> $GITHUB_OUTPUT
+      echo "EXT_TYPE=$(jq --raw-output '."type"' ./plugin/ExtensionManifest.json)" >> $GITHUB_OUTPUT
+      echo "EXT_PACKAGE_ID=$(jq --raw-output '."packageId"' ./plugin/ExtensionManifest.json)" >> $GITHUB_OUTPUT
+      echo "EXT_TARGET_API_VERSION=$(jq '."target-plugin-api-version"' ./plugin/ExtensionManifest.json)" >> $GITHUB_OUTPUT
 
   - name: Validate Extension Info
     if: |

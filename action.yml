@@ -31,6 +31,11 @@ runs:
     shell: bash
     run: |
       echo "::error file=ExtensionManifest.json::Invalid manifest! Required attributes [version, type, packageId, target-plugin-api-version]"
+      echo "[Extension Info Values]"
+      echo "Version                  : ${{ steps.extension_info.outputs.EXT_VERSION }}"
+      echo "Type                     : ${{ steps.extension_info.outputs.EXT_TYPE }}"
+      echo "Package ID               : ${{ steps.extension_info.outputs.EXT_PACKAGE_ID }}"
+      echo "Target Plugin API Version: ${{ steps.extension_info.outputs.EXT_TARGET_API_VERSION }}"
       exit 1
 
   - name: Find MD Commit Hash from API Version

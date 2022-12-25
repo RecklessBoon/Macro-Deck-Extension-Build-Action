@@ -20,15 +20,31 @@ runs:
       echo "EXT_VERSION=$(jq --raw-output '.version' ./plugin/ExtensionManifest.json)" >> $GITHUB_OUTPUT
       echo "EXT_TYPE=$(jq --raw-output '.type' ./plugin/ExtensionManifest.json)" >> $GITHUB_OUTPUT
       echo "EXT_PACKAGE_ID=$(jq --raw-output '.packageId' ./plugin/ExtensionManifest.json)" >> $GITHUB_OUTPUT
+      echo "EXT_TARGET_API_VERSION=$(jq --raw-output '.target-plugin-api-version' ./plugin/ExtensionManifest.json)" >> $GITHUB_OUTPUT
       
   - name: Validate Extension Info
     if: |
       steps.extension_info.outputs.EXT_TYPE == '' || 
       steps.extension_info.outputs.EXT_PACKAGE_ID == '' || 
-      steps.extension_info.outputs.EXT_VERSION == ''
+      steps.extension_info.outputs.EXT_VERSION == '' ||
+      steps.extension_info.outputs.EXT_TARGET_API_VERSION == ''
     shell: bash
     run: |
-      echo "::error file=ExtensionManifest.json::Invalid manifest! Required attributes [version, type, packageId]"
+      echo "::error file=ExtensionManifest.json::Invalid manifest! Required attributes [version, type, packageId, target-plugin-api-version]"
+      exit 1
+      
+  - name: Find MD Commit Hash from API Version
+    id: md_commit_hash
+    shell: bash
+    run: | 
+      echo "COMMIT=$(git ls-remote --tags "https://github.com/Macro-Deck-org/Macro-Deck.git" | cut -f 1 | xargs git grep --name-only -e "PluginApiVersion\s*=\s*36" | cut -f 1 -d ":"
+)" >> $GITHUB_OUTPUT
+
+  - name: Validate MD Commit Hash
+    if: steps.md_commit_hash.outputs.COMMIT == ''
+    shell: bash
+    run: |
+      echo "::error file=ExtensionManifest.json::Unable to find commit for provided Target Plugin API Version"
       exit 1
 
   - name: "[Plugin] Checkout Macro Deck"
@@ -36,7 +52,7 @@ runs:
     if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
     with: 
       repository: SuchByte/Macro-Deck
-      ref: refs/heads/main
+      ref: ${{ steps.md_commit_hash.outputs.COMMIT }}
       path: macro-deck
       
   - name: "[Plugin] Setup .NET"

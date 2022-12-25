@@ -36,7 +36,8 @@ runs:
   - name: Find MD Commit Hash from API Version
     id: md_commit_hash
     shell: bash
-    run: echo "COMMIT=$(git ls-remote --tags "https://github.com/Macro-Deck-org/Macro-Deck.git" | cut -f 1 | xargs git grep --name-only -e "PluginApiVersion\s*=\s*36" | cut -f 1 -d ":"
+    run: |
+      echo "COMMIT=$(git ls-remote --tags "https://github.com/Macro-Deck-org/Macro-Deck.git" | cut -f 1 | xargs git grep --name-only -e "PluginApiVersion\s*=\s*36" | cut -f 1 -d ":"
 )" >> $GITHUB_OUTPUT
 
   - name: Validate MD Commit Hash

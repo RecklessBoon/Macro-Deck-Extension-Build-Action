@@ -8,11 +8,11 @@ runs:
   - name: Install XMLStarlet
     shell: bash
     run: sudo apt-get install -y xmlstarlet jq
-    
+
   - uses: actions/checkout@v3
     with: 
       path: plugin
-      
+
   - name: Extract Extension Info
     id: extension_info
     shell: bash
@@ -21,7 +21,7 @@ runs:
       echo "EXT_TYPE=$(jq --raw-output '.type' ./plugin/ExtensionManifest.json)" >> $GITHUB_OUTPUT
       echo "EXT_PACKAGE_ID=$(jq --raw-output '.packageId' ./plugin/ExtensionManifest.json)" >> $GITHUB_OUTPUT
       echo "EXT_TARGET_API_VERSION=$(jq --raw-output '.target-plugin-api-version' ./plugin/ExtensionManifest.json)" >> $GITHUB_OUTPUT
-      
+
   - name: Validate Extension Info
     if: |
       steps.extension_info.outputs.EXT_TYPE == '' || 
@@ -32,13 +32,12 @@ runs:
     run: |
       echo "::error file=ExtensionManifest.json::Invalid manifest! Required attributes [version, type, packageId, target-plugin-api-version]"
       exit 1
-      
+
   - name: Find MD Commit Hash from API Version
     id: md_commit_hash
     shell: bash
     run: |
-      echo "COMMIT=$(git ls-remote --tags 'https://github.com/Macro-Deck-org/Macro-Deck.git' | cut -f 1 | xargs git grep --name-only -e "PluginApiVersion\s*=\s*36" | cut -f 1 -d ":"
-)" >> $GITHUB_OUTPUT
+      echo "COMMIT=$(git ls-remote --tags 'https://github.com/Macro-Deck-org/Macro-Deck.git' | cut -f 1 | xargs git grep --name-only -e 'PluginApiVersion\s*=\s*${{ steps.extension_info.outputs.EXT_TARGET_API_VERSION }}' | cut -f 1 -d ':')" >> $GITHUB_OUTPUT
 
   - name: Validate MD Commit Hash
     if: steps.md_commit_hash.outputs.COMMIT == ''
@@ -54,7 +53,7 @@ runs:
       repository: SuchByte/Macro-Deck
       ref: ${{ steps.md_commit_hash.outputs.COMMIT }}
       path: macro-deck
-      
+
   - name: "[Plugin] Setup .NET"
     if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
     uses: actions/setup-dotnet@v3
@@ -133,7 +132,7 @@ runs:
       cp ./plugin/ExtensionIcon.png ./dist
       cp ./plugin/README.md ./dist 2>/dev/null || true
       cp ./plugin/LICENSE ./dist 2>/dev/null || true
-      
+
   - name: "[Icon Pack] Validate Contents"
     if: | 
       steps.extension_info.outputs.EXT_TYPE == 'IconPack' &&
@@ -142,7 +141,7 @@ runs:
     run: | 
       echo "::error::No valid icons found"
       exit 1
-      
+
   - name: "[Icon Pack] Stage Distributable"
     if: steps.extension_info.outputs.EXT_TYPE == 'IconPack'
     shell: bash
@@ -151,7 +150,7 @@ runs:
       cp ./plugin/README.md ./dist 2>/dev/null || true
       cp ./plugin/LICENSE ./dist 2>/dev/null || true
       cp ./plugin/ExtensionManifest.json ./dist
-      
+
   - name: Package Distributable
     shell: bash
     run: |

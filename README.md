@@ -3,6 +3,9 @@ This repository houses the composite action for building a Macro Deck extension,
 
 ## How to Use
 You can either use this example template as-is, build upon it, or just use the action in your own worklow build
+
+> **NOTE**: You should replace the version number with the latest
+
 ```yaml
 name: Build Extension
 
@@ -20,5 +23,5 @@ jobs:
 
     steps:
     - name: Build Extension
-      uses: RecklessBoon/Macro-Deck-Extension-Build-Action@v1.0.0
+      uses: RecklessBoon/Macro-Deck-Extension-Build-Action@v1.0.1
 ```

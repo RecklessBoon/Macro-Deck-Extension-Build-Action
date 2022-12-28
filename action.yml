@@ -40,7 +40,7 @@ runs:
 
   - name: Find MD Commit Hash from API Version
     id: md_commit_hash
-    shell: bash {0}
+    shell: bash
     working-directory: ./plugin
     run: git ls-remote --tags 'https://github.com/Macro-Deck-org/Macro-Deck.git' | cut -f 1 | xargs git grep --name-only -e 'PluginApiVersion\s*=\s*${{ steps.extension_info.outputs.EXT_TARGET_API_VERSION }}' | head -n 1 | cut -f 1 -d ':' | echo "COMMIT_HASH=$(cat -)"
 

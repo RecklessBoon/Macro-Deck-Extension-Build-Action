@@ -52,7 +52,7 @@ runs:
     working-directory: ./macro-deck
     run: |
       git fetch --all --tags
-      git ls-remote --tags "https://github.com/Macro-Deck-org/Macro-Deck.git" | cut -f 1 | xargs git grep --name-only -e "PluginApiVersion\s*=\s*${{ steps.extension_info.outputs.EXT_TARGET_API_VERSION }}" | head -n 1 | cut -f 1 -d ':' | echo "COMMIT_HASH=$(cat -)" >> $GITHUB_OUTPUT
+      git ls-remote --tags "https://github.com/Macro-Deck-org/Macro-Deck.git" | cut -f 1 | xargs git grep --max-count 1 --name-only -e "PluginApiVersion\s*=\s*${{ steps.extension_info.outputs.EXT_TARGET_API_VERSION }}" | head -n 1 | cut -f 1 -d ':' | echo "COMMIT_HASH=$(cat -)" >> $GITHUB_OUTPUT
 
   - name: Validate MD Commit Hash
     if: steps.md_commit_hash.outputs.COMMIT_HASH == ''

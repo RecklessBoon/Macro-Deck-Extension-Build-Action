@@ -45,7 +45,7 @@ runs:
     run: git ls-remote --tags 'https://github.com/Macro-Deck-org/Macro-Deck.git' | cut -f 1 | xargs git grep --name-only -e 'PluginApiVersion\s*=\s*${{ steps.extension_info.outputs.EXT_TARGET_API_VERSION }}' | head -n 1 | cut -f 1 -d ':' | echo "COMMIT_HASH=$(cat -)" >> $GITHUB_OUTPUT
 
   - name: Validate MD Commit Hash
-    if: steps.md_commit_hash.outputs.COMMIT_SHA == ''
+    if: steps.md_commit_hash.outputs.COMMIT_HASH == ''
     shell: bash
     run: |
       echo "::error file=ExtensionManifest.json::Unable to find commit for provided Target Plugin API Version ${{ steps.extension_info.outputs.EXT_TARGET_API_VERSION }}"

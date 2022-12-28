@@ -91,7 +91,7 @@ runs:
     if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
     working-directory: ./macro-deck
     shell: bash
-    run: dotnet build --configuration Release --no-restore -property:EnableWindowsTargeting=true -property:SignAssembly=false
+    run: dotnet build --configuration Release --no-restore -property:EnableWindowsTargeting=true -property:SignAssembly=false --output ./bin/output
 
   - name: "[Plugin] Remove Pre Build Targets"
     if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
@@ -106,7 +106,7 @@ runs:
     working-directory: ./macro-deck
     shell: bash
     run: |
-      cp './bin/Release/netcoreapp3.1/win-x64/Macro Deck 2.dll' '../plugin/Macro Deck 2.dll'
+      cp './bin/output/Macro Deck 2.dll' '../plugin/Macro Deck 2.dll'
 
   - name: "[Plugin] Restore dependencies"
     if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
@@ -118,7 +118,7 @@ runs:
     if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
     working-directory: ./plugin
     shell: bash
-    run: dotnet build --configuration Release --no-restore /p:EnableWindowsTargeting=true
+    run: dotnet build --configuration Release --no-restore /p:EnableWindowsTargeting=true --output ./bin/output
 
   - name: "[Plugin] Test"
     if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
@@ -134,7 +134,7 @@ runs:
     if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
     shell: bash
     run: |
-      cp ./plugin/bin/Release/netcoreapp3.1/* ./dist
+      cp ./plugin/bin/output/* ./dist
       cp ./plugin/ExtensionManifest.json ./dist
       cp ./plugin/ExtensionIcon.png ./dist
       cp ./plugin/README.md ./dist 2>/dev/null || true

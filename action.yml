@@ -41,7 +41,6 @@ runs:
 
   - name: Checkout Macro Deck Repository
     uses: actions/checkout@v3
-    if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
     with: 
       repository: SuchByte/Macro-Deck
       ref: ${{ steps.md_commit_hash.outputs.COMMIT }}

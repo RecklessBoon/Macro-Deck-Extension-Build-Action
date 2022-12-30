@@ -106,6 +106,7 @@ runs:
         -s //ItemGroupTMP/Content -t elem -n CopyToOutputDirectory -v "Always" \
         -r //ItemGroupTMP -v ItemGroup \
         *.csproj
+      cat *.csproj
 
   - name: "[Plugin] Move dll into location"
     if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'

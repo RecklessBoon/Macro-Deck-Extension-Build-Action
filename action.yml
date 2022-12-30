@@ -118,7 +118,7 @@ runs:
     if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
     working-directory: ./plugin
     shell: bash
-    run: dotnet build --configuration Release --no-restore /p:EnableWindowsTargeting=true --output ./bin/output
+    run: dotnet msbuild -property:Configuration=Release -property:EnableWindowsTargeting=true -property:OutDir=./bin/output
 
   - name: "[Plugin] Test"
     if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'

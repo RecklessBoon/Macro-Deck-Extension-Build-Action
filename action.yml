@@ -100,7 +100,14 @@ runs:
     run : |
       xmlstarlet ed -P -L --delete '//Target[@Name="PreBuild"]' *.csproj 2>/dev/null || true
       xmlstarlet ed -P -L --delete '//Target[@Name="PostBuild"]' *.csproj 2>/dev/null || true
+
+  - name: "[Plugin] Lowercase Subdir/Files in Resources"
+    if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
+    working-directory: ./plugin
+    shell: bash
+    run: |
       cp -r Resources resources 2>/dev/null || true
+      find resources -depth -exec rename 's/(.*)\/([^\/]*)/$1\/\L$2/' {} \; 2>/dev/null || true
 
   - name: "[Plugin] Move dll into location"
     if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'

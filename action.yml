@@ -118,7 +118,7 @@ runs:
     if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
     working-directory: ./plugin
     shell: bash
-    run: dotnet build --configuration Release --no-restore /p:EnableWindowsTargeting=true --output ./output
+    run: dotnet build --configuration Release --no-restore /p:EnableWindowsTargeting=true
 
   - name: "[Plugin] Test"
     if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
@@ -134,7 +134,7 @@ runs:
     if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
     shell: bash
     run: |
-      cp ./plugin/output/* ./dist
+      cp ./plugin/bin/Release/*/* ./dist
       cp ./plugin/ExtensionManifest.json ./dist
       cp ./plugin/ExtensionIcon.png ./dist
       cp ./plugin/README.md ./dist 2>/dev/null || true

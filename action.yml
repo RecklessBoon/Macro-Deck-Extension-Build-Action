@@ -14,12 +14,6 @@ runs:
     with: 
       path: plugin
 
-  - name: Make directories lowercase
-    shell: bash
-    run: |
-      zip -0 -r plugin.zip ./plugin
-      unzip -LL plugin.zip
-
   - name: Extract Extension Info
     id: extension_info
     shell: bash
@@ -80,6 +74,7 @@ runs:
     run : |
       xmlstarlet ed -P -L --delete '//Target[@Name="PreBuild"]' *.csproj
       xmlstarlet ed -P -L --delete '//Target[@Name="PostBuild"]' *.csproj
+      cp -r Resources resources 2>/dev/null || true
 
   - name: "[Plugin] Remove COM Reference"
     if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'

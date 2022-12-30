@@ -106,8 +106,8 @@ runs:
     working-directory: ./plugin
     shell: bash
     run: |
-      cp -r Resources resources 2>/dev/null || true
-      find resources -depth -exec rename 's/(.*)\/([^\/]*)/$1\/\L$2/' {} \; 2>/dev/null || true
+      zip -0 -r resources.zip Resources/*
+      unzip -LL resources.zip
 
   - name: "[Plugin] Move dll into location"
     if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'

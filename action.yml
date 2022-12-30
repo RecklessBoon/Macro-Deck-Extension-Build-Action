@@ -74,7 +74,6 @@ runs:
     run : |
       xmlstarlet ed -P -L --delete '//Target[@Name="PreBuild"]' *.csproj
       xmlstarlet ed -P -L --delete '//Target[@Name="PostBuild"]' *.csproj
-      cp -r Resources resources 2>/dev/null || true
 
   - name: "[Plugin] Remove COM Reference"
     if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
@@ -108,6 +107,7 @@ runs:
         -r //ItemGroupTMP -v ItemGroup \
         *.csproj
       cat *.csproj
+      cp -r Resources resources 2>/dev/null || true
 
   - name: "[Plugin] Move dll into location"
     if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'

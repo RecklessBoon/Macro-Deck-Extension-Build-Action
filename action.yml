@@ -98,8 +98,8 @@ runs:
     working-directory: ./plugin
     shell: bash
     run : |
-      xmlstarlet ed -P -L --delete '//Target[@Name="PreBuild"]' *.csproj
-      xmlstarlet ed -P -L --delete '//Target[@Name="PostBuild"]' *.csproj
+      xmlstarlet ed -P -L --delete '//Target[@Name="PreBuild"]' *.csproj 2>/dev/null || true
+      xmlstarlet ed -P -L --delete '//Target[@Name="PostBuild"]' *.csproj 2>/dev/null || true
       xmlstarlet ed -P -S -L -s /Project -t elem -n ItemGroupTMP -v "" \
         -s //ItemGroupTMP -t elem -n Content -v "" \
         -i //ItemGroupTMP/Content -t attr -n "Include" -v "Resources\*.*" \
@@ -125,7 +125,9 @@ runs:
     if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
     working-directory: ./plugin
     shell: bash
-    run: dotnet build --configuration release --no-restore /p:EnableWindowsTargeting=true --output ./output
+    run: |
+      dotnet build --configuration release --no-restore /p:EnableWindowsTargeting=true --output ./output 2>/dev/null
+      tree
 
   - name: "[Plugin] Test"
     if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'

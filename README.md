@@ -4,7 +4,7 @@ This repository houses the composite action for building a Macro Deck extension,
 ## How to Use
 You can either use this example template as-is in a file with path `.github/workflows/build_extension.yml`, build upon it, or just use the action in your own worklow build
 
-> **NOTE**: You can also replace `latest` with a version number (tag)
+> **NOTE**: You should replace the version number with the latest tag. Or if you want to always use the latest use `@latest`
 
 ```yaml
 name: Build Extension

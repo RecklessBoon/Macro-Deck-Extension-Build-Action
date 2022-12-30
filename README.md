@@ -23,5 +23,5 @@ jobs:
 
     steps:
     - name: Build Extension
-      uses: RecklessBoon/Macro-Deck-Extension-Build-Action@latest
+      uses: RecklessBoon/Macro-Deck-Extension-Build-Action@v1.0.6
 ```

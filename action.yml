@@ -100,6 +100,11 @@ runs:
     run : |
       xmlstarlet ed -P -L --delete '//Target[@Name="PreBuild"]' *.csproj
       xmlstarlet ed -P -L --delete '//Target[@Name="PostBuild"]' *.csproj
+      xmlstarlet ed -P -S -L -s /Project -t elem -n ItemGroupTMP -v "" \
+        -s //ItemGroupTMP -t elem -n Content -v "" \
+        -i //ItemGroupTMP -t attr -n "Include" -v "Resources\*.*"
+        -s //ItemGroupTMP/Content -t elem -n CopyToOutputDirectory -v "Always"
+        -r //ItemGroup -v ItemGroup 
 
   - name: "[Plugin] Move dll into location"
     if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'

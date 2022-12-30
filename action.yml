@@ -14,6 +14,12 @@ runs:
     with: 
       path: plugin
 
+  - name: Make directories lowercase
+    shell: bash
+    run: |
+      zip -0 -r plugin.zip ./plugin
+      unzip -LL plugin.zip
+
   - name: Extract Extension Info
     id: extension_info
     shell: bash

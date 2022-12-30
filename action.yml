@@ -102,7 +102,9 @@ runs:
       xmlstarlet ed -P -L --delete '//Target[@Name="PostBuild"]' *.csproj 2>/dev/null || true
 
   - name: "[Plugin] Lowercase Subdir/Files in Resources"
-    if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
+    if: |
+      steps.extension_info.outputs.EXT_TYPE == 'Plugin' &&
+      hashFiles('./plugin/Resources') != ''
     working-directory: ./plugin
     shell: bash
     run: |

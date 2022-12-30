@@ -102,7 +102,7 @@ runs:
       xmlstarlet ed -P -L --delete '//Target[@Name="PostBuild"]' *.csproj
       xmlstarlet ed -P -S -L -s /Project -t elem -n ItemGroupTMP -v "" \
         -s //ItemGroupTMP -t elem -n Content -v "" \
-        -i //ItemGroupTMP -t attr -n "Include" -v "Resources\*.*" \
+        -i //ItemGroupTMP/Content -t attr -n "Include" -v "Resources\*.*" \
         -s //ItemGroupTMP/Content -t elem -n CopyToOutputDirectory -v "Always" \
         -r //ItemGroupTMP -v ItemGroup \
         *.csproj

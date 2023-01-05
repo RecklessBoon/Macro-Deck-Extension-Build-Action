@@ -4,12 +4,16 @@ description: 'Build a Macro Deck Extension from source'
 inputs:
   upsert-release:
     description: "['true'|'false'] Whether this action should upload the buildable to a release with the same tag name, creating one if it doesn't exist"
-    required: true
+    required: false
     default: 'true'
   ext-repo:
     description: 'Same as action/checkout repository property: Repository name with owner. For example, actions/checkout'
-    required: true
-    default: ${{ github.repository }}
+    required: false
+    default: ''
+  ext-ref:
+    description: "Same as action/checkout ref property: The branch, tag or SHA to checkout."
+    required: false
+    default: ''
     
 outputs:
   artifact-name:
@@ -28,6 +32,7 @@ runs:
     uses: actions/checkout@v3
     with: 
       repository: ${{ inputs.ext-repo }}
+      ref: ${{ inputs.ext-ref }}
       path: plugin
 
   - name: Extract Extension Info

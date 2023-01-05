@@ -2,10 +2,19 @@ name: 'Build Macro Deck Extension'
 description: 'Build a Macro Deck Extension from source'
 
 inputs:
+  upsert-release:
+    description: "['true'|'false'] Whether this action should upload the buildable to a release with the same tag name, creating one if it doesn't exist"
+    required: true
+    default: 'true'
   ext-repo:
     description: 'Same as action/checkout repository property: Repository name with owner. For example, actions/checkout'
     required: true
     default: ${{ github.repository }}
+    
+outputs:
+  artifact-name:
+    description: "Artifact name to use in the download-artifact action in order to get the distributable file"
+    value: ${{ steps.set-outputs.outputs.artifact-name }}
 
 runs:
   using: "composite"
@@ -187,8 +196,15 @@ runs:
       path: ./${{ steps.extension_info.outputs.EXT_PACKAGE_ID }}-${{ steps.extension_info.outputs.EXT_VERSION }}.zip
       name: ${{ steps.extension_info.outputs.EXT_PACKAGE_ID }}
       if-no-files-found: error
+      
+  - mame: Set Outputs
+    id: set-outputs
+    shell: bash
+    run: |
+      echo "artifact-name='${{ steps.extension_info.outputs.EXT_PACKAGE_ID }}'" >> $GITHUB_OUTPUT
 
   - name: Create/Update Release
+    if: ${{ inputs.upsert-release }} == 'true'
     uses: ncipollo/release-action@v1
     with:
       allowUpdates: true

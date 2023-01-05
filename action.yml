@@ -197,7 +197,7 @@ runs:
       name: ${{ steps.extension_info.outputs.EXT_PACKAGE_ID }}
       if-no-files-found: error
       
-  - mame: Set Outputs
+  - name: Set Outputs
     id: set-outputs
     shell: bash
     run: |

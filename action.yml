@@ -193,7 +193,7 @@ runs:
     shell: bash
     run: |
       cd ./dist
-      zip -r ../${{ steps.extension_info.outputs.EXT_PACKAGE_ID }}-${{ steps.extension_info.outputs.EXT_VERSION }}.zip *
+      zip -r ../${{ steps.extension_info.outputs.EXT_PACKAGE_ID }}-${{ steps.extension_info.outputs.EXT_VERSION }}.zip . -i *
 
   - name: Upload a Build Artifact
     uses: actions/upload-artifact@v3.1.1

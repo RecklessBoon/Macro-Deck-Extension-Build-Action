@@ -149,7 +149,7 @@ runs:
     if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
     working-directory: ./plugin
     shell: bash
-    run: dotnet build --configuration release --no-restore /p:EnableWindowsTargeting=true --output ./output $(ls -al *.csproj | head -1)
+    run: dotnet build --configuration release --no-restore /p:EnableWindowsTargeting=true --output ./output (*.csproj)[0]
 
   - name: "[Plugin] Test"
     if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'

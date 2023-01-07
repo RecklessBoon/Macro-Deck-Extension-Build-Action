@@ -143,19 +143,19 @@ runs:
     if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
     working-directory: ./plugin
     shell: bash
-    run: dotnet restore /p:EnableWindowsTargeting=true (*.csproj)[0]
+    run: dotnet restore /p:EnableWindowsTargeting=true $(ls *.csproj | head -n1)
 
   - name: "[Plugin] Build Plugin"
     if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
     working-directory: ./plugin
     shell: bash
-    run: dotnet build --configuration release --no-restore /p:EnableWindowsTargeting=true --output ./output (*.csproj)[0]
+    run: dotnet build --configuration release --no-restore /p:EnableWindowsTargeting=true --output ./output $(ls *.csproj | head -n1)
 
   - name: "[Plugin] Test"
     if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
     working-directory: ./plugin
     shell: bash
-    run: dotnet test --no-build --verbosity normal (*.csproj)[0]
+    run: dotnet test --no-build --verbosity normal $(ls *.csproj | head -n1)
 
   - name: Prepare Distributable Staging Area
     shell: bash

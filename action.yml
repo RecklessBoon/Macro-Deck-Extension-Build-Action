@@ -4,8 +4,7 @@ description: 'Build a Macro Deck Extension from source'
 inputs:
   upsert-release:
     description: "[true|false] Whether this action should upload the buildable to a release with the same tag name, creating one if it doesn't exist"
-    required: false
-    default: true
+    required: true
   ext-repo:
     description: 'Same as action/checkout repository property: Repository name with owner. For example, actions/checkout'
     required: false

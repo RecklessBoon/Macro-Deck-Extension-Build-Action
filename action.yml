@@ -211,7 +211,7 @@ runs:
       echo "artifact-name='${{ steps.extension_info.outputs.EXT_PACKAGE_ID }}'" >> $GITHUB_OUTPUT
 
   - name: Create/Update Release
-    if: inputs.upsert-release === 'true'
+    if: inputs.upsert-release == 'true'
     uses: ncipollo/release-action@v1
     with:
       allowUpdates: true

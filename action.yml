@@ -3,8 +3,9 @@ description: 'Build a Macro Deck Extension from source'
 
 inputs:
   upsert-release:
-    description: "[true|false] Whether this action should upload the buildable to a release with the same tag name, creating one if it doesn't exist"
+    description: "['true'|'false'] Whether this action should upload the buildable to a release with the same tag name, creating one if it doesn't exist"
     required: true
+    default: ''
   ext-repo:
     description: 'Same as action/checkout repository property: Repository name with owner. For example, actions/checkout'
     required: false
@@ -210,7 +211,7 @@ runs:
       echo "artifact-name='${{ steps.extension_info.outputs.EXT_PACKAGE_ID }}'" >> $GITHUB_OUTPUT
 
   - name: Create/Update Release
-    if: inputs.upsert-release == true
+    if: inputs.upsert-release === 'true'
     uses: ncipollo/release-action@v1
     with:
       allowUpdates: true

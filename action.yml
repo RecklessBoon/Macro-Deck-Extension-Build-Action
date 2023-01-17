@@ -19,6 +19,9 @@ outputs:
   artifact-name:
     description: "Artifact name to use in the download-artifact action in order to get the distributable file"
     value: ${{ steps.set-outputs.outputs.artifact-name }}
+  artifact-path:
+    description: "Artifact path to use int he download-artifact action in order to get the distributable file"
+    value: ${{ steps.set-outputs.outputs.artifact-path }}
 
 runs:
   using: "composite"
@@ -209,6 +212,7 @@ runs:
     shell: bash
     run: |
       echo "artifact-name=${{ steps.extension_info.outputs.EXT_PACKAGE_ID }}" >> $GITHUB_OUTPUT
+      echo "artifact-path=${{ steps.extension_info.outputs.EXT_PACKAGE_ID }}-${{ steps.extension_info.outputs.EXT_VERSION }}.zip" >> $GITHUB_OUTPUT
 
   - name: Create/Update Release
     if: inputs.upsert-release == 'true'

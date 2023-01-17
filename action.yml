@@ -208,7 +208,7 @@ runs:
     id: set-outputs
     shell: bash
     run: |
-      echo "artifact-name='${{ steps.extension_info.outputs.EXT_PACKAGE_ID }}'" >> $GITHUB_OUTPUT
+      echo "artifact-name=${{ steps.extension_info.outputs.EXT_PACKAGE_ID }}" >> $GITHUB_OUTPUT
 
   - name: Create/Update Release
     if: inputs.upsert-release == 'true'

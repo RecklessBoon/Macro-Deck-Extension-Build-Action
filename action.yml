@@ -42,7 +42,7 @@ runs:
     id: extension_info
     shell: bash
     run: |
-      json=$(cat "./plugin/ExtensionManifest.json")
+      json=$(cat "./plugin/ExtensionManifest.json" | tr '\n' '\\n')
       echo "manifest=$json"
       echo "manifest=$json" >> $GITHUB_ENV
 

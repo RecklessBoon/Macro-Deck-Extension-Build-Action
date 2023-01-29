@@ -43,8 +43,8 @@ runs:
     shell: bash
     run: |
       json=$(cat "./plugin/ExtensionManifest.json" | sed ':a;N;$!ba;s/\n/\\n/g')
-      echo "manifest=$json"
-      echo "manifest=$json" >> $GITHUB_ENV
+      echo "manifest=$'$json'"
+      echo "manifest=$'$json'" >> $GITHUB_ENV
 
   - name: Validate Extension Info
     if: |

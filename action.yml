@@ -44,7 +44,7 @@ runs:
     run: |
       json=$(cat "./plugin/ExtensionManifest.json")
       echo "manifest=$json"
-      delim=$RANDOM
+      delim="EOF-${RANDOM}"
       echo "manifest<<${delim}" >> $GITHUB_ENV
       echo $json >> $GITHUB_ENV
       echo "${delim}" >> $GITHUB_ENV

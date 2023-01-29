@@ -44,9 +44,8 @@ runs:
     run: |
       delim="EOF-${RANDOM}"
       echo "manifest<<${delim}" >> $GITHUB_ENV
-      cat "./plugin/ExtensionManifest.json" >> $GITHUB_ENV
-      echo "" >> $GITHUB_ENV
-      echo "${delim}" >> $GITHUB_ENV
+      cat "./plugin/ExtensionManifest.json" | awk '{$1=$1};NF' >> $GITHUB_ENV
+      echo -e "\n${delim}" >> $GITHUB_ENV
 
   - name: Validate Extension Info
     if: |

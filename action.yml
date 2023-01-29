@@ -27,9 +27,9 @@ runs:
   using: "composite"
   
   steps:
-  - name: Install XMLStarlet
+  - name: Install Dependencies
     shell: bash
-    run: sudo apt-get install -y xmlstarlet jq
+    run: sudo apt-get install -y xmlstarlet dos2unix
 
   - name: "Checkout Extension Repository"
     uses: actions/checkout@v3

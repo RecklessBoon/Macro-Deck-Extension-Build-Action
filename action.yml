@@ -41,8 +41,7 @@ runs:
   - name: Extract Extension Info
     id: extension_info
     shell: bash
-    run: |
-      echo "manifest=$(cat ./plugin/ExtensionManifest.json)" >> $GITHUB_ENV
+    run: cat <(echo -n "manifest=") "./plugin/ExtensionManifest.json" >> $GITHUB_ENV
 
   - name: Validate Extension Info
     if: |

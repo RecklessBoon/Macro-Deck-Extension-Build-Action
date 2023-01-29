@@ -52,13 +52,12 @@ runs:
       fromJSON(env.manifest).target-plugin-api-version == ''
     shell: bash
     run: |
-      echo "::error file=ExtensionManifest.json::Invalid manifest! Required attributes [version, type, packageId, target-plugin-api-version]"
       echo "[Extension Info Values]"
       echo "Version                  : ${{ fromJSON(env.manifest).version }}"
       echo "Type                     : ${{ fromJSON(env.manifest).type }}"
       echo "Package ID               : ${{ fromJSON(env.manifest).packageId }}"
       echo "Target Plugin API Version: ${{ fromJSON(env.manifest).target-plugin-api-version }}"
-      exit 1
+      echo "::error file=ExtensionManifest.json::Invalid manifest! Required attributes [version, type, packageId, target-plugin-api-version]" && exit 1
 
   - name: Checkout Macro Deck Repository
     uses: actions/checkout@v3
@@ -79,8 +78,7 @@ runs:
     if: steps.md_commit_hash.outputs.COMMIT_HASH == ''
     shell: bash
     run: |
-      echo "::error file=ExtensionManifest.json::Unable to find commit for provided Target Plugin API Version ${{ fromJSON(env.manifest).target-plugin-api-version }}"
-      exit 1
+      echo "::error file=ExtensionManifest.json::Unable to find commit for provided Target Plugin API Version ${{ fromJSON(env.manifest).target-plugin-api-version }}" && exit 1
 
   - name: "[Plugin] Setup .NET"
     if: fromJSON(env.manifest).type == 'Plugin' || fromJSON(env.manifest).type == 0
@@ -179,8 +177,7 @@ runs:
       hashFiles('./plugin/*.gif', './plugin/*.png', './plugin/*.jpg') == ''
     shell: bash
     run: | 
-      echo "::error::No valid icons found"
-      exit 1
+      echo "::error::No valid icons found" && exit 1
 
   - name: "[Icon Pack] Stage Distributable"
     if: fromJSON(env.manifest).type == 'IconPack' || fromJSON(env.manifest).type == 1

@@ -46,7 +46,7 @@ runs:
       echo "manifest=$json"
       delim=$RANDOM
       echo "manifest<<${delim}" >> $GITHUB_ENV
-      echo "$json" >> $GITHUB_ENV
+      echo $json >> $GITHUB_ENV
       echo "${delim}" >> $GITHUB_ENV
 
   - name: Validate Extension Info

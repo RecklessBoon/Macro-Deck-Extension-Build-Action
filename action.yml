@@ -44,9 +44,10 @@ runs:
     run: |
       json=$(cat "./plugin/ExtensionManifest.json")
       echo "manifest=$json"
-      echo "manifest<<EOF" >> $GITHUB_ENV
+      delim=$RANDOM
+      echo "manifest<<${delim}" >> $GITHUB_ENV
       echo "$json" >> $GITHUB_ENV
-      echo "EOF" >> $GITHUB_ENV
+      echo "${delim}" >> $GITHUB_ENV
 
   - name: Validate Extension Info
     if: |

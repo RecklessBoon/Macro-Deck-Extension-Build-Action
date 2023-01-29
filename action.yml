@@ -43,7 +43,13 @@ runs:
     shell: bash
     run: |
       echo "EXT_VERSION=$(jq --raw-output '."version"' ./plugin/ExtensionManifest.json)" >> $GITHUB_OUTPUT
-      echo "EXT_TYPE=$(jq --raw-output '."type"' ./plugin/ExtensionManifest.json)" >> $GITHUB_OUTPUT
+      type=$(jq --raw-output '."type"' ./plugin/ExtensionManifest.json)
+      if [ $type -eq 0 ]; then
+        type="Plugin"
+      elif [ $type -eq 1 ]; then
+        type="IconPack"
+      fi
+      echo "EXT_TYPE=$type" >> $GITHUB_OUTPUT
       echo "EXT_PACKAGE_ID=$(jq --raw-output '."packageId"' ./plugin/ExtensionManifest.json)" >> $GITHUB_OUTPUT
       echo "EXT_TARGET_API_VERSION=$(jq '."target-plugin-api-version"' ./plugin/ExtensionManifest.json)" >> $GITHUB_OUTPUT
 

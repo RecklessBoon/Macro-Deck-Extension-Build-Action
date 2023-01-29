@@ -42,31 +42,22 @@ runs:
     id: extension_info
     shell: bash
     run: |
-      echo "EXT_VERSION=$(jq --raw-output '."version"' ./plugin/ExtensionManifest.json)" >> $GITHUB_OUTPUT
-      type=$(jq --raw-output '."type"' ./plugin/ExtensionManifest.json)
-      if [ $type -eq 0 ]; then
-        type="Plugin"
-      elif [ $type -eq 1 ]; then
-        type="IconPack"
-      fi
-      echo "EXT_TYPE=$type" >> $GITHUB_OUTPUT
-      echo "EXT_PACKAGE_ID=$(jq --raw-output '."packageId"' ./plugin/ExtensionManifest.json)" >> $GITHUB_OUTPUT
-      echo "EXT_TARGET_API_VERSION=$(jq '."target-plugin-api-version"' ./plugin/ExtensionManifest.json)" >> $GITHUB_OUTPUT
+      echo "manifest=$(cat ./plugin/ExtensionManifest.json)" >> $GITHUB_ENV
 
   - name: Validate Extension Info
     if: |
-      steps.extension_info.outputs.EXT_TYPE == '' || 
-      steps.extension_info.outputs.EXT_PACKAGE_ID == '' || 
-      steps.extension_info.outputs.EXT_VERSION == '' ||
-      steps.extension_info.outputs.EXT_TARGET_API_VERSION == ''
+      fromJSON(env.manifest).type == '' || 
+      fromJSON(env.manifest).packageId == '' || 
+      fromJSON(env.manifest).version == '' ||
+      fromJSON(env.manifest).target-plugin-api-version == ''
     shell: bash
     run: |
       echo "::error file=ExtensionManifest.json::Invalid manifest! Required attributes [version, type, packageId, target-plugin-api-version]"
       echo "[Extension Info Values]"
-      echo "Version                  : ${{ steps.extension_info.outputs.EXT_VERSION }}"
-      echo "Type                     : ${{ steps.extension_info.outputs.EXT_TYPE }}"
-      echo "Package ID               : ${{ steps.extension_info.outputs.EXT_PACKAGE_ID }}"
-      echo "Target Plugin API Version: ${{ steps.extension_info.outputs.EXT_TARGET_API_VERSION }}"
+      echo "Version                  : ${{ fromJSON(env.manifest).version }}"
+      echo "Type                     : ${{ fromJSON(env.manifest).type }}"
+      echo "Package ID               : ${{ fromJSON(env.manifest).packageId }}"
+      echo "Target Plugin API Version: ${{ fromJSON(env.manifest).target-plugin-api-version }}"
       exit 1
 
   - name: Checkout Macro Deck Repository
@@ -82,17 +73,17 @@ runs:
     working-directory: ./macro-deck
     run: |
       git fetch --all --tags
-      git ls-remote --tags "https://github.com/Macro-Deck-org/Macro-Deck.git" | cut -f 1 | xargs git grep --max-count 1 --name-only -e "PluginApiVersion\s*=\s*${{ steps.extension_info.outputs.EXT_TARGET_API_VERSION }}" | cut -f 1 -d ':' | head -n 1 | echo "COMMIT_HASH=$(cat -)" >> $GITHUB_OUTPUT
+      git ls-remote --tags "https://github.com/Macro-Deck-org/Macro-Deck.git" | cut -f 1 | xargs git grep --max-count 1 --name-only -e "PluginApiVersion\s*=\s*${{ fromJSON(env.manifest).target-plugin-api-version }}" | cut -f 1 -d ':' | head -n 1 | echo "COMMIT_HASH=$(cat -)" >> $GITHUB_OUTPUT
 
   - name: Validate MD Commit Hash
     if: steps.md_commit_hash.outputs.COMMIT_HASH == ''
     shell: bash
     run: |
-      echo "::error file=ExtensionManifest.json::Unable to find commit for provided Target Plugin API Version ${{ steps.extension_info.outputs.EXT_TARGET_API_VERSION }}"
+      echo "::error file=ExtensionManifest.json::Unable to find commit for provided Target Plugin API Version ${{ fromJSON(env.manifest).target-plugin-api-version }}"
       exit 1
 
   - name: "[Plugin] Setup .NET"
-    if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
+    if: fromJSON(env.manifest).type == 'Plugin' || fromJSON(env.manifest).type == 0
     uses: actions/setup-dotnet@v3
     with:
       dotnet-version: |
@@ -100,7 +91,7 @@ runs:
         6.0.x
 
   - name: "[Plugin] Remove Pre Build Targets"
-    if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
+    if: fromJSON(env.manifest).type == 'Plugin' || fromJSON(env.manifest).type == 0
     working-directory: ./macro-deck
     shell: bash
     run : |
@@ -108,25 +99,25 @@ runs:
       xmlstarlet ed -P -L --delete '//Target[@Name="PostBuild"]' *.csproj
 
   - name: "[Plugin] Remove COM Reference"
-    if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
+    if: fromJSON(env.manifest).type == 'Plugin' || fromJSON(env.manifest).type == 0
     working-directory: ./macro-deck
     shell: bash
     run: dotnet remove reference NetFwTypeLib
 
   - name: "[Plugin] Restore dependencies"
-    if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
+    if: fromJSON(env.manifest).type == 'Plugin' || fromJSON(env.manifest).type == 0
     working-directory: ./macro-deck
     shell: bash
     run: dotnet restore -property:EnableWindowsTargeting=true
 
   - name: "[Plugin] Build Macro Deck"
-    if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
+    if: fromJSON(env.manifest).type == 'Plugin' || fromJSON(env.manifest).type == 0
     working-directory: ./macro-deck
     shell: bash
     run: dotnet build --configuration release --no-restore -property:EnableWindowsTargeting=true -property:SignAssembly=false --output ./output
 
   - name: "[Plugin] Remove Pre Build Targets"
-    if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
+    if: fromJSON(env.manifest).type == 'Plugin' || fromJSON(env.manifest).type == 0
     working-directory: ./plugin
     shell: bash
     run : |
@@ -135,7 +126,7 @@ runs:
 
   - name: "[Plugin] Lowercase Subdir/Files in Resources"
     if: |
-      steps.extension_info.outputs.EXT_TYPE == 'Plugin' &&
+      (fromJSON(env.manifest).type == 'Plugin' || fromJSON(env.manifest).type == 0) &&
       hashFiles('./plugin/Resources') != ''
     working-directory: ./plugin
     shell: bash
@@ -144,26 +135,26 @@ runs:
       unzip -LL resources.zip
 
   - name: "[Plugin] Move dll into location"
-    if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
+    if: fromJSON(env.manifest).type == 'Plugin' || fromJSON(env.manifest).type == 0
     working-directory: ./macro-deck
     shell: bash
     run: |
       cp './output/Macro Deck 2.dll' '../plugin/Macro Deck 2.dll'
 
   - name: "[Plugin] Restore dependencies"
-    if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
+    if: fromJSON(env.manifest).type == 'Plugin' || fromJSON(env.manifest).type == 0
     working-directory: ./plugin
     shell: bash
     run: dotnet restore "$(ls *.csproj | head -n1)" /p:EnableWindowsTargeting=true
 
   - name: "[Plugin] Build Plugin"
-    if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
+    if: fromJSON(env.manifest).type == 'Plugin' || fromJSON(env.manifest).type == 0
     working-directory: ./plugin
     shell: bash
     run: dotnet build "$(ls *.csproj | head -n1)" --configuration release --no-restore /p:EnableWindowsTargeting=true --output ./output
 
   - name: "[Plugin] Test"
-    if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
+    if: fromJSON(env.manifest).type == 'Plugin' || fromJSON(env.manifest).type == 0
     working-directory: ./plugin
     shell: bash
     run: dotnet test "$(ls *.csproj | head -n1)" --no-build --verbosity normal
@@ -173,7 +164,7 @@ runs:
     run: mkdir dist
 
   - name: "[Plugin] Stage Distributable"
-    if: steps.extension_info.outputs.EXT_TYPE == 'Plugin'
+    if: fromJSON(env.manifest).type == 'Plugin' || fromJSON(env.manifest).type == 0
     shell: bash
     run: |
       cp ./plugin/output/*.* ./dist
@@ -184,7 +175,7 @@ runs:
 
   - name: "[Icon Pack] Validate Contents"
     if: | 
-      steps.extension_info.outputs.EXT_TYPE == 'IconPack' &&
+      (fromJSON(env.manifest).type == 'IconPack' || fromJSON(env.manifest).type == 1) &&
       hashFiles('./plugin/*.gif', './plugin/*.png', './plugin/*.jpg') == ''
     shell: bash
     run: | 
@@ -192,7 +183,7 @@ runs:
       exit 1
 
   - name: "[Icon Pack] Stage Distributable"
-    if: steps.extension_info.outputs.EXT_TYPE == 'IconPack'
+    if: fromJSON(env.manifest).type == 'IconPack' || fromJSON(env.manifest).type == 1
     shell: bash
     run: |
       cp ./plugin/*.{gif,jpg,png} ./dist 2>/dev/null || true
@@ -204,21 +195,21 @@ runs:
     shell: bash
     run: |
       cd ./dist
-      zip -r ../${{ steps.extension_info.outputs.EXT_PACKAGE_ID }}-${{ steps.extension_info.outputs.EXT_VERSION }}.zip . -i *
+      zip -r ../${{ fromJSON(env.manifest).packageId }}-${{ fromJSON(env.manifest).version }}.zip . -i *
 
   - name: Upload a Build Artifact
     uses: actions/upload-artifact@v3.1.1
     with:
-      path: ./${{ steps.extension_info.outputs.EXT_PACKAGE_ID }}-${{ steps.extension_info.outputs.EXT_VERSION }}.zip
-      name: ${{ steps.extension_info.outputs.EXT_PACKAGE_ID }}
+      path: ./${{ fromJSON(env.manifest).packageId }}-${{ fromJSON(env.manifest).version }}.zip
+      name: ${{ fromJSON(env.manifest).packageId }}
       if-no-files-found: error
       
   - name: Set Outputs
     id: set-outputs
     shell: bash
     run: |
-      echo "artifact-name=${{ steps.extension_info.outputs.EXT_PACKAGE_ID }}" >> $GITHUB_OUTPUT
-      echo "artifact-path=${{ steps.extension_info.outputs.EXT_PACKAGE_ID }}-${{ steps.extension_info.outputs.EXT_VERSION }}.zip" >> $GITHUB_OUTPUT
+      echo "artifact-name=${{ fromJSON(env.manifest).packageId }}" >> $GITHUB_OUTPUT
+      echo "artifact-path=${{ fromJSON(env.manifest).packageId }}-${{ fromJSON(env.manifest).version }}.zip" >> $GITHUB_OUTPUT
 
   - name: Create/Update Release
     if: inputs.upsert-release == 'true'
@@ -226,9 +217,9 @@ runs:
     with:
       allowUpdates: true
       artifactErrorsFailBuild: false
-      artifacts: './${{ steps.extension_info.outputs.EXT_PACKAGE_ID }}-${{ steps.extension_info.outputs.EXT_VERSION }}.zip'
+      artifacts: './${{ fromJSON(env.manifest).packageId }}-${{ fromJSON(env.manifest).version }}.zip'
       commit: ${{ github.sha }}
       generateReleaseNotes: true
       makeLatest: true
       replacesArtifacts: true
-      tag: ${{ steps.extension_info.outputs.EXT_VERSION }}
+      tag: ${{ fromJSON(env.manifest).version }}
